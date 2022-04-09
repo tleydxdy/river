@@ -62,6 +62,8 @@ const usage =
     \\                  layout. (Default 1)
     \\  -main-ratio     Set the initial ratio of main area to total layout
     \\                  area. (Default: 0.6)
+    \\  -monocle-tags   Set which tags have the monocle layout at the start
+    \\                  (Default: none)
     \\
 ;
 
@@ -69,6 +71,7 @@ const Command = enum {
     @"main-location",
     @"main-count",
     @"main-ratio",
+    @"monocle",
 };
 
 const Location = enum {
@@ -84,6 +87,7 @@ var outer_padding: u31 = 6;
 var default_main_location: Location = .left;
 var default_main_count: u31 = 1;
 var default_main_ratio: f64 = 0.6;
+var default_monocle_tags: u32 = 0;
 
 /// We don't free resources on exit, only when output globals are removed.
 const gpa = std.heap.c_allocator;
@@ -103,6 +107,8 @@ const Context = struct {
     }
 };
 
+const use_tags: u32 = (1 << 9) - 1;
+
 const Output = struct {
     wl_output: *wl.Output,
     name: u32,
@@ -110,6 +116,8 @@ const Output = struct {
     main_location: Location,
     main_count: u31,
     main_ratio: f64,
+    monocle_tags: u32,
+    current_tags: u32,
 
     layout: *river.LayoutV3 = undefined,
 
@@ -120,6 +128,8 @@ const Output = struct {
             .main_location = default_main_location,
             .main_count = default_main_count,
             .main_ratio = default_main_ratio,
+            .monocle_tags = default_monocle_tags,
+            .current_tags = 0,
         };
         if (context.initialized) try output.getLayout(context);
     }
@@ -192,12 +202,29 @@ const Output = struct {
                             else => output.main_ratio = math.clamp(arg, 0.1, 0.9),
                         }
                     },
+                    .@"monocle" => {
+                        if (std.mem.eql(u8, raw_arg, "true")) {
+                            output.monocle_tags |= output.current_tags;
+                        } else {
+                            output.monocle_tags &= ~output.current_tags;
+                        }
+                        output.monocle_tags &= use_tags;
+                    },
                 }
             },
 
             .layout_demand => |ev| {
                 assert(ev.view_count > 0);
 
+                output.current_tags = use_tags & ev.tags;
+                if (output.current_tags == output.current_tags & output.monocle_tags) {
+                    var i: u31 = 0;
+                    while (i < ev.view_count) : (i += 1) {
+                        layout.pushViewDimensions(0, 0, ev.usable_width, ev.usable_height, ev.serial);
+                    }
+                    layout.commit("rivertile - monocle", ev.serial);
+                    return;
+                }
                 const main_count = math.min(output.main_count, @truncate(u31, ev.view_count));
                 const secondary_count = @truncate(u31, ev.view_count) -| main_count;
 
@@ -311,6 +338,7 @@ pub fn main() !void {
         .{ .name = "main-location", .kind = .arg },
         .{ .name = "main-count", .kind = .arg },
         .{ .name = "main-ratio", .kind = .arg },
+        .{ .name = "monocle-tags", .kind = .arg },
     }).parse(os.argv[1..]) catch {
         try std.io.getStdErr().writeAll(usage);
         os.exit(1);
@@ -348,6 +376,11 @@ pub fn main() !void {
         if (default_main_ratio < 0.1 or default_main_ratio > 0.9) {
             fatalPrintUsage("invalid value '{s}' provided to -main-ratio", .{raw});
         }
+    }
+    if (result.flags.@"monocle-tags") |raw| {
+        default_monocle_tags = fmt.parseUnsigned(u32, raw, 10) catch {
+            fatalPrintUsage("invalid value '{s}' provided to -monocle-tags", .{raw});
+        };
     }
 
     const display = wl.Display.connect(null) catch {

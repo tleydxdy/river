@@ -42,6 +42,9 @@ modified while rivertile is running with the help of *riverctl*(1).
 	Set the initial ratio of the main area to total layout area. The
 	_ratio_ must be between 0.1 and 0.9, inclusive. (Default: 0.6)
 
+*-monocle-tags* _tags_
+	Set which tags have the monocle layout at the start. (Default: none)
+
 # COMMANDS
 
 These commands may be sent to rivertile at runtime with the help of
@@ -62,6 +65,9 @@ These commands may be sent to rivertile at runtime with the help of
 	the current ratio. If there is no sign, the main ratio is set to
 	_value_. Note that the ratio will always be clamped to the range
 	0.1 to 0.9.
+
+*monocle* [*true*|*false*]
+	Set/unset monocle layout for the currently selected tags.
 
 # EXAMPLES
 

@@ -32,6 +32,12 @@ pub const AttachMode = enum {
     bottom,
 };
 
+pub const SmartBordersMode = enum {
+    disabled,
+    /// Turn off border when the view takes up all usable space
+    enabled,
+};
+
 pub const FocusFollowsCursorMode = enum {
     disabled,
     /// Only change focus on entering a surface
@@ -65,6 +71,9 @@ border_color_unfocused: [4]f32 = [_]f32{ 0.34509804, 0.43137255, 0.45882353, 1.0
 
 /// Color of border of urgent window in RGBA with premultiplied alpha
 border_color_urgent: [4]f32 = [_]f32{ 0.86274510, 0.19607843, 0.18431373, 1.0 }, // Solarized red
+
+/// The selected smart_border mode
+smart_borders: SmartBordersMode = .disabled,
 
 /// Map of keymap mode name to mode id
 /// Does not own the string keys. They are owned by the corresponding Mode struct.

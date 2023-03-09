@@ -50,6 +50,7 @@ function __riverctl_completion ()
 			border-color-unfocused \
 			border-color-urgent \
 			border-width \
+			smart-borders \
 			focus-follows-cursor \
 			hide-cursor \
 			set-repeat \
@@ -67,6 +68,7 @@ function __riverctl_completion ()
 			"map") OPTS="-release -repeat -layout" ;;
 			"unmap") OPTS="-release" ;;
 			"attach-mode") OPTS="top bottom" ;;
+			"smart-borders") OPTS="disabled enabled" ;;
 			"focus-follows-cursor") OPTS="disabled normal always" ;;
 			"set-cursor-warp") OPTS="disabled on-output-change on-focus-change" ;;
 			"hide-cursor") OPTS="timeout when-typing" ;;

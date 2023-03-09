@@ -46,6 +46,7 @@ const command_impls = std.ComptimeStringMap(
         .{ "border-color-unfocused",    @import("command/config.zig").borderColorUnfocused },
         .{ "border-color-urgent",       @import("command/config.zig").borderColorUrgent },
         .{ "border-width",              @import("command/config.zig").borderWidth },
+        .{ "smart-borders",             @import("command/config.zig").smartBorders },
         .{ "close",                     @import("command/close.zig").close },
         .{ "declare-mode",              @import("command/declare_mode.zig").declareMode },
         .{ "default-layout",            @import("command/layout.zig").defaultLayout },

@@ -323,6 +323,13 @@ matches everything while _\*\*_ and the empty string are invalid.
 *border-width* _pixels_
 	Set the border width to _pixels_.
 
+*smart-borders* *disabled*|*enabled*
+	Set the smart borders mode. There are two available modes:
+
+	- _disabled_: Borders are set on all views. This is the default.
+	- _enabled_: When one stacked view fills the usable space, it will not have
+	  borders.
+
 *focus-follows-cursor* *disabled*|*normal*|*always*
 	There are three available modes:
 

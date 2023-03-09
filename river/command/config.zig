@@ -88,6 +88,19 @@ pub fn borderColorUrgent(
     server.root.applyPending();
 }
 
+pub fn smartBorders(
+    _: *Seat,
+    args: []const [:0]const u8,
+    _: *?[]const u8,
+) Error!void {
+    if (args.len < 2) return Error.NotEnoughArguments;
+    if (args.len > 2) return Error.TooManyArguments;
+
+    server.config.smart_borders = std.meta.stringToEnum(Config.SmartBordersMode, args[1]) orelse
+        return Error.UnknownOption;
+    server.root.applyPending();
+}
+
 pub fn setCursorWarp(
     _: *Seat,
     args: []const [:0]const u8,
